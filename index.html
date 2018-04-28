@@ -1,0 +1,213 @@
+<html>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Abhijit Padhy">
+
+<head>
+    <link rel="stylesheet" href="./scripts/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Raleway');
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: #2e9ce6;
+            padding: 3em;
+        }
+
+        .header {
+            /* background: #ccc;
+            width: 100%; */
+            padding: 10px;
+        }
+
+        .header div {
+            display: inline-block;
+        }
+
+        .view {
+            display: grid;
+            grid-template-columns: 50% auto;
+            padding: 10px;
+            border: 1px solid #2885c4;
+        }
+
+        .search-view {
+            background: #2885c4;
+        }
+
+        .lib-view {
+            background: #57b3f1;
+        }
+
+        ul {
+            list-style: none;
+            padding: 5px;
+            margin: 0 0 2em 0;
+        }
+
+        ul li {
+            padding: 5px;
+            background: #3183d5;
+            box-shadow: 1px 1px 3px #4c4cde;
+            margin-bottom: 4px;
+        }
+
+        .lib-list li {
+            cursor: pointer;
+        }
+
+        .search-box input[type=text] {
+            padding: 6px;
+            margin-top: 8px;
+            font-size: 17px;
+            border: none;
+            color: #6089b1;
+        }
+
+        input[type=text], input[type=password] {
+            color: #4c4cde;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .search-box button {
+            float: right;
+            padding: 6px;
+            margin-top: 8px;
+            margin-right: 16px;
+            background: #146fad;
+            font-size: 17px;
+            border: none;
+            cursor: pointer;
+            color: white;
+        }
+
+        .search-box button:hover {
+            background: #ccc;
+        }
+
+        .login {
+            border: 1px solid #2885c4;
+        }
+
+        .beforeLog {
+            position: fixed;
+
+
+            z-index: 1050;
+
+            left: 0;
+
+            right: 0;
+
+            top: 0;
+
+            bottom: 0;
+
+            opacity: 1;
+
+            padding: 17px;
+            display: block;
+        }
+
+        .afterLog {
+            display: none;
+        }
+
+        .login-box {
+            position: relative;
+
+            width: auto;
+
+            margin: 1px;
+
+            padding: 14px;
+
+            text-align: center;
+
+            background: #13cb08;
+
+            border-radius: 8px;
+        }
+
+        .login-box div {
+            padding: 5px;
+        }
+
+        .login-box input,
+        .login-box button {
+            width: 180px;
+        }
+    </style>
+</head>
+<script type="text/javascript" src="./scripts/jquery-3.3.1.min.js"></script>
+<script src="./scripts/angular.min.js"></script>
+<script src="./scripts/bootstrap-3.3.7-dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+    crossorigin="anonymous"></script>
+
+<body ng-app="app" ng-controller="ctrl">
+    <div class="header">
+        <div class="title">Loktra Shows</div>
+        <div class="search-box">
+            <input type="text" ng-model="name" placeholder="Search movies..">
+            <button type="submit" class="" ng-click="fetchList()">Submit</button>
+        </div>
+    </div>
+    <div class="wrapper">
+        <div class="view search-view">
+            <span>Select movies</span>
+            <span>Library</span>
+        </div>
+        <div class="view lib-view">
+            <ul class="search-list">
+                <li class="search-movies" ng-repeat="m in movieList track by $index" ng-click="addToLib(m)">{{m.Title}}</li>
+            </ul>
+            <ul class="lib-list">
+                <li class="selected-movie" ng-repeat="m in libMovies track by $index">{{m.Title}}</li>
+            </ul>
+        </div>
+    </div>
+    <div id="login" class="beforeLog">
+        <div class="login-box">
+            <div class="user-name-input">
+                <input type="text" ng-model="userName" placeholder="username">
+            </div>
+            <div class="pass-word-input">
+                <input type="password" ng-model="passWord" placeholder="password">
+            </div>
+            <div class="login-btn">
+                <button type="submit" class="btn btn-default" ng-click="login()">Login</button>
+            </div>
+
+        </div>
+    </div>
+</body>
+<script>
+    var app = angular.module('app', []);
+    app.controller('ctrl', function ($scope, $http) {
+        $scope.message = "hello";
+        $scope.movieList = [];
+        $scope.libMovies = [];
+        $scope.name = "";
+        localStorage.setItem('lib', '');
+        $scope.loginFlag = true;
+        $scope.fetchList = function () {
+            var req = 'http://www.omdbapi.com/?apikey=c959a13c&t=' + $scope.name;
+            $http.get(req)
+                .then(function (response) {
+                    $scope.movieList.push(response.data);
+                    console.log("mov list: ", response);
+                });
+        };
+        $scope.addToLib = function (obj) {
+            $scope.libMovies.push(obj);
+            localStorage.setItem('lib', localStorage.getItem('lib') + ',' + obj.Title);
+        };
+        $scope.login = function(){
+            // $scope.loginFlag = false;
+            $("#login").removeClass("beforeLog");
+            $("#login").addClass('afterLog');
+            $("#login").remove();
+        }
+    });
+</script>
+
+</html>
